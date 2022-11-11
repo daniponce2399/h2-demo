@@ -25,9 +25,9 @@ public class FindProductServiceImpl implements FindProductService {
                     productEntity.setStartDate(productEntity.getStartDate().replace(" ", "T"));
                     productEntity.setEndDate(productEntity.getEndDate().replace(" ", "T"));
                 })
-                .onErrorContinue(
-                        RuntimeException.class,
-                        (e, o) -> System.out.println("ERROR")
-                );
+                .onErrorResume(e ->{
+                    log.error("Error trying to find details from productId ({})", productId, e);
+                    return Mono.error(new RuntimeException("Error500"));
+                });
     }
 }
