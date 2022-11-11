@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 public class FindProductServiceImpl implements FindProductService {
@@ -20,14 +22,15 @@ public class FindProductServiceImpl implements FindProductService {
 
     @Override
     public Mono<ProductEntity> findProductByParameters(Integer brandId, Integer productId, String date){
-        return Mono.just(productRepository.findByBrandIdAndProductIdAndDate(brandId,productId,date))
-                .doOnNext(productEntity -> {
+        try {
+        return Optional.ofNullable(this.productRepository.findByBrandIdAndProductIdAndDate(brandId,productId,date))
+                .map(productEntity -> {
                     productEntity.setStartDate(productEntity.getStartDate().replace(" ", "T"));
                     productEntity.setEndDate(productEntity.getEndDate().replace(" ", "T"));
-                })
-                .onErrorResume(e ->{
-                    log.error("Error trying to find details from productId ({})", productId, e);
-                    return Mono.error(new RuntimeException("Error500"));
-                });
+                    return Mono.just(productEntity);
+                }).orElse(Mono.just(new ProductEntity()));
+        }catch (Exception e) {
+            return Mono.error(e);
+        }
     }
 }

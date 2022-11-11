@@ -5,6 +5,7 @@ import h2demo.model.ProductEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import reactor.core.publisher.Mono;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -81,5 +82,12 @@ public class ProductControllerTest {
         assertThat(result.getPrice()).isEqualTo(38.95);
         assertThat(result.getStartDate()).isEqualTo("2020-06-15T16:00:00");
         assertThat(result.getEndDate()).isEqualTo("2020-12-31T23:59:59");
+    }
+
+    @Test
+    public void obtainSearchProductsTestError(){
+        var response = productController.getStudent("2010-06-14T10.00.00",35455, 1);
+
+        assertThat(response).isNotNull();
     }
 }
